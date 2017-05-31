@@ -7,8 +7,11 @@
 [![codecov.io](http://codecov.io/github/c42f/FastClosures.jl/coverage.svg?branch=master)](http://codecov.io/github/c42f/FastClosures.jl?branch=master)
 
 
-A workaround for https://github.com/JuliaLang/julia/issues/15276, in the spirit
-of FastAnonymous.jl.
+A workaround for https://github.com/JuliaLang/julia/issues/15276, somewhat in
+the spirit of FastAnonymous.jl.  Provides the `@closure` macro, which wraps a
+closure in a `let` block to make reading variable bindings private to the
+closure.  In certain cases, this make using the closure - and the code
+surrouding it - much faster.
 
 ```julia
 using FastClosures
