@@ -1,7 +1,14 @@
 using FastClosures
 using Base.Test
 
-import FastClosures: find_var_uses
+# Test utility wrapping find_var_uses!
+function find_var_uses(ex)
+    vars = Symbol[]
+    bound_vars = Symbol[]
+    FastClosures.find_var_uses!(vars, bound_vars, ex)
+    vars
+end
+
 
 # code_warntype issues
 function f1()
@@ -44,9 +51,6 @@ end
     @test find_var_uses(:(a*a)) == [:a]
     # Assignment rebinds, doesn't count as a "use".
     @test find_var_uses(:(a=1)) == []
-    # Multiple-Exprs find_var_uses; each arg should be an independent block
-    # from the point of view of variable assignments.
-    @test find_var_uses(:(a=1), :(a+b)) == [:a, :b]
     # keyword args
     @test find_var_uses(:(f(a, b=1, c=2, d=e))) == [:a, :e]
 end

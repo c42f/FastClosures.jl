@@ -6,7 +6,8 @@ using Compat
 export @closure
 
 macro closure(ex_orig)
-    ex = macroexpand(@compat(@__MODULE__), ex_orig)
+    ex = Compat.macros_have_sourceloc ?
+         macroexpand(__module__, ex_orig) : macroexpand(ex_orig)
     #@show ex_orig ex
     @assert ex isa Expr && ex.head == Symbol("->")
     if ex.args[1] isa Expr
@@ -30,22 +31,12 @@ end
 #FIXME function find_closure_args(ex)
 #end
 
-# Utility function - find all accesses to variables inside `exs` which are not
-# bound there.
+# Utility function - fill `varlist` with all accesses to variables inside `ex`
+# which are not bound before being accessed.  Variables which were bound
+# before access are returned in `bound_vars` as a side effect.
 #
-# As this works with the surface syntax, it unfortunately has to reproduce some
-# of the lowering logic.
-function find_var_uses(exs...)
-    # Bindings which are accessed inside `exs`
-    vars = Symbol[]
-    # Bindings which are created inside `exs`
-    for ex in exs
-        bound_vars = Symbol[]
-        find_var_uses!(vars, bound_vars, macroexpand(@compat(@__MODULE__), ex))
-    end
-    vars
-end
-
+# With works with the surface syntax so it unfortunately has to reproduce some
+# of the lowering logic (and consequently likely has bugs!)
 function find_var_uses!(varlist, bound_vars, ex)
     if isa(ex, Symbol)
         if !(ex in bound_vars)
