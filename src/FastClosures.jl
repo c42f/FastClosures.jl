@@ -1,11 +1,12 @@
 __precompile__()
 
 module FastClosures
+using Compat
 
 export @closure
 
 macro closure(ex_orig)
-    ex = macroexpand(ex_orig)
+    ex = macroexpand(@compat(@__MODULE__), ex_orig)
     #@show ex_orig ex
     @assert ex isa Expr && ex.head == Symbol("->")
     if ex.args[1] isa Expr
@@ -40,7 +41,7 @@ function find_var_uses(exs...)
     # Bindings which are created inside `exs`
     for ex in exs
         bound_vars = Symbol[]
-        find_var_uses!(vars, bound_vars, macroexpand(ex))
+        find_var_uses!(vars, bound_vars, macroexpand(@compat(@__MODULE__), ex))
     end
     vars
 end
