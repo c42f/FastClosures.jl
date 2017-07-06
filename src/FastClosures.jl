@@ -3,20 +3,29 @@ __precompile__()
 module FastClosures
 using Compat
 
+using Base.Meta
+
 export @closure
 
 macro closure(ex_orig)
     ex = Compat.macros_have_sourceloc ?
          macroexpand(__module__, ex_orig) : macroexpand(ex_orig)
-    #@show ex_orig ex
-    @assert ex isa Expr && ex.head == Symbol("->")
-    if ex.args[1] isa Expr
-        # FIXME support type assertions
-        bound_vars = Symbol[ex.args[1].args...]
+    if isexpr(ex, :(->))
+        args1 = ex.args[1]
+        if args1 isa Symbol
+            funcargs = [args1]
+        else
+            @assert isexpr(args1, :tuple)
+            funcargs = args1.args
+        end
+    elseif isexpr(ex, :function)
+        @assert isexpr(ex.args[1], :call)
+        funcargs = ex.args[1].args[2:end]
     else
-        @assert ex.args[1] isa Symbol
-        bound_vars = Symbol[ex.args[1]]
+        throw(ArgumentError("Argument to @closure must be a closure!"))
     end
+    # FIXME support type assertions and kw args
+    bound_vars = Symbol[funcargs...]
     @assert ex.args[2] isa Expr && ex.args[2].head == :block
     captured_vars = Symbol[]
     find_var_uses!(captured_vars, bound_vars, ex.args[2])
