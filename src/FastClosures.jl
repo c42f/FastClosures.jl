@@ -12,7 +12,7 @@ macro closure(ex_orig)
          macroexpand(__module__, ex_orig) : macroexpand(ex_orig)
     if isexpr(ex, :(->))
         args1 = ex.args[1]
-        if args1 isa Symbol
+        if isa(args1, Symbol)
             funcargs = [args1]
         else
             @assert isexpr(args1, :tuple)
@@ -26,7 +26,7 @@ macro closure(ex_orig)
     end
     # FIXME support type assertions and kw args
     bound_vars = Symbol[funcargs...]
-    @assert ex.args[2] isa Expr && ex.args[2].head == :block
+    @assert isa(ex.args[2], Expr) && ex.args[2].head == :block
     captured_vars = Symbol[]
     find_var_uses!(captured_vars, bound_vars, ex.args[2])
     quote
