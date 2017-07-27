@@ -7,10 +7,10 @@
 [![codecov.io](http://codecov.io/github/c42f/FastClosures.jl/coverage.svg?branch=master)](http://codecov.io/github/c42f/FastClosures.jl?branch=master)
 
 
-A workaround for https://github.com/JuliaLang/julia/issues/15276, somewhat in
-the spirit of FastAnonymous.jl.  Provides the `@closure` macro, which wraps a
-closure in a `let` block to make reading variable bindings private to the
-closure.  In certain cases, this make using the closure - and the code
+A workaround for https://github.com/JuliaLang/julia/issues/15276, for julia-0.6,
+somewhat in the spirit of FastAnonymous.jl.  Provides the `@closure` macro,
+which wraps a closure in a `let` block to make reading variable bindings private
+to the closure.  In certain cases, this make using the closure - and the code
 surrouding it - much faster.
 
 ```julia
@@ -37,3 +37,6 @@ end
 @code_warntype f1()
 @code_warntype f2()
 ```
+
+Note that it's not clear that the `let` block trick implemented in this package
+helps at all in julia-0.5; it doesn't help in the case above.
