@@ -40,6 +40,9 @@ end
     @test (@closure (x,y,z)->x+a)(1,2,3) === 1.5
     #@test_broken (@closure (x::Int,y::Int,z::Int)->x+a)(1,2,3) === 1.5
     @test (@closure function blah(x,y,z); x+a; end)(1,2,3) === 1.5
+    # Test that when macroexpand() fails inside the @closure macro, the correct
+    # error is generated
+    @test_throws UndefVarError @eval(@closure () -> @nonexistent_macro)
 end
 
 

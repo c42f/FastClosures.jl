@@ -37,6 +37,11 @@ restructure the code to avoid the closure.
 macro closure(closure_expression)
     ex = Compat.macros_have_sourceloc ?
          macroexpand(__module__, closure_expression) : macroexpand(closure_expression)
+    if isexpr(ex, :error)
+        # There was an error in macroexpand - just return the original
+        # expression so that the user gets a comprehensible error message.
+        return esc(closure_expression)
+    end
     if isexpr(ex, :(->))
         args1 = ex.args[1]
         if isa(args1, Symbol)
@@ -49,7 +54,7 @@ macro closure(closure_expression)
         @assert isexpr(ex.args[1], :call)
         funcargs = ex.args[1].args[2:end]
     else
-        throw(ArgumentError("Argument to @closure must be a closure!"))
+        throw(ArgumentError("Argument to @closure must be a closure!  (Got $closure_expression)"))
     end
     # FIXME support type assertions and kw args
     bound_vars = Symbol[funcargs...]
