@@ -8,35 +8,33 @@ using Base.Meta
 export @closure
 
 """
-    @closure closure_expression
+    wrap_closure(module_, closure_expression)
 
-Wrap the closure definition `closure_expression` in a let block to encourage
-the julia compiler to generate improved type information.  For example:
+Wrap `closure_expression` in a `let` block to improve efficiency.  Using this
+rather than `@closure` is necessary when interpolating variables into the
+closure expression.  (Interpolation happens only *after* the macro sees the
+expression.)  See the docs for `@closure` for additional detail.
 
-```julia
-callfunc(f) = f()
+Example: you should use
 
-function foo(n)
-   for i=1:n
-       if i >= n
-           # Unlikely event - should be fast.  However, capture of `i` inside
-           # the closure confuses the julia-0.6 compiler and causes it to box
-           # the variable `i`, leading to a 100x performance hit if you remove
-           # the `@closure`.
-           callfunc(@closure ()->println("Hello \$i"))
-       end
-   end
+```
+result = :(i)
+quote
+    \$(wrap_closure(current_module(), :(()->\$result)))
 end
 ```
 
-There's nothing nice about this - it's a heuristic workaround for some
-inefficiencies in the type information inferred by the julia 0.6 compiler.
-However, it can result in large speedups in many cases, without the need to
-restructure the code to avoid the closure.
+rather than
+
+```
+result = :(i)
+quote
+    @closure ()->\$result
+end
+```
 """
-macro closure(closure_expression)
-    ex = Compat.macros_have_sourceloc ?
-         macroexpand(__module__, closure_expression) : macroexpand(closure_expression)
+function wrap_closure(module_, closure_expression)
+    ex = macroexpand(module_, closure_expression)
     if isexpr(ex, :error)
         # There was an error in macroexpand - just return the original
         # expression so that the user gets a comprehensible error message.
@@ -66,6 +64,41 @@ macro closure(closure_expression)
             $(esc(closure_expression))
         end
     end
+end
+
+"""
+    @closure closure_expression
+
+Wrap the closure definition `closure_expression` in a let block to encourage
+the julia compiler to generate improved type information.  For example:
+
+```julia
+callfunc(f) = f()
+
+function foo(n)
+   for i=1:n
+       if i >= n
+           # Unlikely event - should be fast.  However, capture of `i` inside
+           # the closure confuses the julia-0.6 compiler and causes it to box
+           # the variable `i`, leading to a 100x performance hit if you remove
+           # the `@closure`.
+           callfunc(@closure ()->println("Hello \$i"))
+       end
+   end
+end
+```
+
+See `wrap_closure()` for cases where you want to interpolate an expression into
+the closure wrapped by `@closure`.
+
+There's nothing nice about this - it's a heuristic workaround for some
+inefficiencies in the type information inferred by the julia 0.6 compiler.
+However, it can result in large speedups in many cases, without the need to
+restructure the code to avoid the closure.
+"""
+macro closure(ex)
+    module_ = Compat.macros_have_sourceloc ?  __module__ : current_module()
+    wrap_closure(module_, ex)
 end
 
 # Find arguments in closure arg list
