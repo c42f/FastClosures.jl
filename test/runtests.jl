@@ -120,13 +120,6 @@ end
 end
 
 
-@testset "wrap_closure" begin
-    result = :(i)
-    ex = FastClosures.wrap_closure(Main, :(()->$result))
-    @test ex.args[2].head == :let
-    @test length(ex.args[2].args) == 2  # args should be [let_body, let_binding1]
-end
-
 end
 
 

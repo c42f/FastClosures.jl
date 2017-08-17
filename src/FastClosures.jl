@@ -7,38 +7,13 @@ using Base.Meta
 
 export @closure
 
-"""
-    wrap_closure(module_, closure_expression)
-
-Wrap `closure_expression` in a `let` block to improve efficiency.  Using this
-rather than `@closure` is necessary when interpolating variables into the
-closure expression.  (Interpolation happens only *after* the macro sees the
-expression.)  See the docs for `@closure` for additional detail.
-
-Example: you should use
-
-```
-result = :(i)
-quote
-    \$(wrap_closure(current_module(), :(()->\$result)))
-end
-```
-
-rather than
-
-```
-result = :(i)
-quote
-    @closure ()->\$result
-end
-```
-"""
+# Wrap `closure_expression` in a `let` block to improve efficiency.
 function wrap_closure(module_, closure_expression)
     ex = macroexpand(module_, closure_expression)
     if isexpr(ex, :error)
         # There was an error in macroexpand - just return the original
         # expression so that the user gets a comprehensible error message.
-        return esc(closure_expression)
+        return closure_expression
     end
     if isexpr(ex, :(->))
         args1 = ex.args[1]
@@ -60,8 +35,8 @@ function wrap_closure(module_, closure_expression)
     captured_vars = Symbol[]
     find_var_uses!(captured_vars, bound_vars, ex.args[2])
     quote
-        let $([:($(esc(v))=$(esc(v))) for v in captured_vars]...)
-            $(esc(closure_expression))
+        let $([:($v=$v) for v in captured_vars]...)
+            $closure_expression
         end
     end
 end
@@ -88,9 +63,6 @@ function foo(n)
 end
 ```
 
-See `wrap_closure()` for cases where you want to interpolate an expression into
-the closure wrapped by `@closure`.
-
 There's nothing nice about this - it's a heuristic workaround for some
 inefficiencies in the type information inferred by the julia 0.6 compiler.
 However, it can result in large speedups in many cases, without the need to
@@ -98,7 +70,7 @@ restructure the code to avoid the closure.
 """
 macro closure(ex)
     module_ = Compat.macros_have_sourceloc ?  __module__ : current_module()
-    wrap_closure(module_, ex)
+    esc(wrap_closure(module_, ex))
 end
 
 # Find arguments in closure arg list
