@@ -28,6 +28,12 @@ function f2()
     identity(cb)
 end
 
+macro nested_closure(ex)
+    quote
+        @closure x->x+$(esc(ex))
+    end
+end
+
 @testset "FastClosures" begin
 
 @testset "Basic closure tests" begin
@@ -45,6 +51,13 @@ end
     @test_throws UndefVarError @eval(@closure () -> @nonexistent_macro)
 end
 
+@testset "@closure use inside a macro" begin
+    # Test workaround for
+    # https://github.com/JuliaLang/julia/issues/23221
+    y = 10
+    z = @nested_closure(y)(2)
+    @test z == 12
+end
 
 @testset "internal find_var_uses torture tests" begin
 
