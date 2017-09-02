@@ -3,10 +3,10 @@ using Base.Test
 
 # Test utility wrapping find_var_uses!
 function find_var_uses(ex)
-    vars = Symbol[]
-    bound_vars = Symbol[]
-    FastClosures.find_var_uses!(vars, bound_vars, ex)
-    vars
+    vars = FastClosures.Var[]
+    bound_vars = FastClosures.Var[]
+    FastClosures.find_var_uses!(vars, bound_vars, ex, 0)
+    Symbol[v.name for v in vars]
 end
 
 
