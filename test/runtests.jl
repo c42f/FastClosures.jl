@@ -46,6 +46,12 @@ end
     @test (@closure (x,y,z)->x+a)(1,2,3) === 1.5
     #@test_broken (@closure (x::Int,y::Int,z::Int)->x+a)(1,2,3) === 1.5
     @test (@closure function blah(x,y,z); x+a; end)(1,2,3) === 1.5
+    @test begin
+        @closure function blah(x,y,z)
+            x+a
+        end
+        blah(1,2,3)
+    end === 1.5
     @test_throws ArgumentError @eval(@closure(1+2))
     # Test that when macroexpand() fails inside the @closure macro, the correct
     # error is generated
