@@ -46,7 +46,7 @@ end
     @test (@closure (x,y,z)->x+a)(1,2,3) === 1.5
     #@test_broken (@closure (x::Int,y::Int,z::Int)->x+a)(1,2,3) === 1.5
     @test (@closure function blah(x,y,z); x+a; end)(1,2,3) === 1.5
-    @test begin
+    @test_broken begin
         @closure function blah(x,y,z)
             x+a
         end
