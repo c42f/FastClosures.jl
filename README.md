@@ -1,10 +1,8 @@
 # FastClosures
 
-[![Build Status](https://travis-ci.org/c42f/FastClosures.jl.svg?branch=master)](https://travis-ci.org/c42f/FastClosures.jl)
-
-[![Coverage Status](https://coveralls.io/repos/c42f/FastClosures.jl/badge.svg?branch=master&service=github)](https://coveralls.io/github/c42f/FastClosures.jl?branch=master)
-
-[![codecov.io](http://codecov.io/github/c42f/FastClosures.jl/coverage.svg?branch=master)](http://codecov.io/github/c42f/FastClosures.jl?branch=master)
+| **Releases - PackageEvaluator**                                                                            | **Development - Build Status**                                                                                |
+|:-----------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------:|
+| [![FastClosures](http://pkg.julialang.org/badges/FastClosures_0.5.svg)](http://pkg.julialang.org/detail/FastClosures)    [![FastClosures](http://pkg.julialang.org/badges/FastClosures_0.6.svg)](http://pkg.julialang.org/detail/FastClosures) | [![Build Status](https://travis-ci.org/c42f/FastClosures.jl.svg?branch=master)](https://travis-ci.org/c42f/FastClosures.jl)   [![codecov.io](http://codecov.io/github/c42f/FastClosures.jl/coverage.svg?branch=master)](http://codecov.io/github/c42f/FastClosures.jl?branch=master) |
 
 
 A workaround for https://github.com/JuliaLang/julia/issues/15276, for julia-0.6,
