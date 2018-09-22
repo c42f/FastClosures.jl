@@ -1,5 +1,4 @@
-using FastClosures
-using Base.Test
+using FastClosures, Compat, Compat.Test
 
 # Test utility wrapping find_var_uses!
 function find_var_uses(ex)
