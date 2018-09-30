@@ -8,20 +8,23 @@ function find_var_uses(ex)
     Symbol[v.name for v in vars]
 end
 
-# https://discourse.julialang.org/t/exceptions-in-macros-in-julia-0-7-1-0/14145/2
+# Check that a particular error occurs during macro invocation.  In 0.7 / 1.0
+# this is wrapped in a LoadError, so unwrap that before rethrowing.  See also
+# https://discourse.julialang.org/t/exceptions-in-macros-in-julia-0-7-1-0/14145/2
 macro test_macro_throws(typ, expr)
     quote
         @test_throws $typ begin
             try
-                $expr
+                $(esc(expr))
             catch e
-                rethrow(e.error)
+                while e isa LoadError
+                    e = e.error
+                end
+                rethrow(e)
             end
         end
     end
 end
-
-
 
 # code_warntype issues
 function f1()
@@ -65,14 +68,10 @@ end
         end
         blah(1,2,3)
     end === 1.5
-    if VERSION < v"0.7"
-      @test_throws ArgumentError @eval(@closure(1+2))
-    else
-      @test_macro_throws ArgumentError @eval(@closure(1+2))
-    end
+    @test_macro_throws ArgumentError @eval(@closure(1+2))
     # Test that when macroexpand() fails inside the @closure macro, the correct
     # error is generated
-    @test_broken #=UndefVarError=# @eval(@closure () -> @nonexistent_macro)
+    @test_macro_throws UndefVarError @eval(@closure () -> @nonexistent_macro)
 end
 
 @testset "@closure use inside a macro" begin
