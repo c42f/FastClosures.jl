@@ -1,5 +1,4 @@
-using FastClosures
-using Base.Test
+using FastClosures, Compat, Compat.Test
 
 # Test utility wrapping find_var_uses!
 function find_var_uses(ex)
@@ -9,6 +8,23 @@ function find_var_uses(ex)
     Symbol[v.name for v in vars]
 end
 
+# Check that a particular error occurs during macro invocation.  In 0.7 / 1.0
+# this is wrapped in a LoadError, so unwrap that before rethrowing.  See also
+# https://discourse.julialang.org/t/exceptions-in-macros-in-julia-0-7-1-0/14145/2
+macro test_macro_throws(typ, expr)
+    quote
+        @test_throws $typ begin
+            try
+                $(esc(expr))
+            catch e
+                while e isa LoadError
+                    e = e.error
+                end
+                rethrow(e)
+            end
+        end
+    end
+end
 
 # code_warntype issues
 function f1()
@@ -52,10 +68,10 @@ end
         end
         blah(1,2,3)
     end === 1.5
-    @test_throws ArgumentError @eval(@closure(1+2))
+    @test_macro_throws ArgumentError @eval(@closure(1+2))
     # Test that when macroexpand() fails inside the @closure macro, the correct
     # error is generated
-    @test_throws UndefVarError @eval(@closure () -> @nonexistent_macro)
+    @test_macro_throws UndefVarError @eval(@closure () -> @nonexistent_macro)
 end
 
 @testset "@closure use inside a macro" begin
