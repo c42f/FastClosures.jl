@@ -28,7 +28,7 @@ function wrap_closure(module_, closure_expression)
         # expression so that the user gets a comprehensible error message.
         return closure_expression
     end
-    if isexpr(ex, :call) && length(ex.args) >= 2 && isexpr(ex.args[2], :(->)) # do syntax
+    if isexpr(ex, :do) && length(ex.args) >= 2 && isexpr(ex.args[2], :(->)) # do syntax
         ex = ex.args[2]
     end
     if isexpr(ex, :(->))
