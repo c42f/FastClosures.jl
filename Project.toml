@@ -1,5 +1,5 @@
 name = "FastClosures"
-uuid = "bdbe9a3c-3508-4b39-9c5a-ef0d5dd90d30"
+uuid = "9aa1b823-49e4-5ca5-8b0f-3971ec8bab6a"
 version = "0.2.1"
 
 [deps]
