@@ -157,6 +157,16 @@ end
         )) == [:e,:f]
 end
 
+@testset "do syntax" begin
+    function test_do(a)
+        b = zeros(10)
+        c = (rand(),rand())
+        c = @closure ntuple(Val{2}()) do i
+            c[i] + b[i] + a
+        end
+    end
+    @inferred test_do(22)
+end
 
 end
 
