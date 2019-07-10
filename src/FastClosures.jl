@@ -1,7 +1,4 @@
-__precompile__()
-
 module FastClosures
-using Compat
 
 using Base.Meta
 
@@ -85,8 +82,7 @@ However, it can result in large speedups in many cases, without the need to
 restructure the code to avoid the closure.
 """
 macro closure(ex)
-    module_ = Compat.macros_have_sourceloc ?  __module__ : current_module()
-    esc(wrap_closure(module_, ex))
+    esc(wrap_closure(__module__, ex))
 end
 
 # Find arguments in closure arg list
