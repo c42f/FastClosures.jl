@@ -103,7 +103,7 @@ function find_var_uses!(varlist, bound_vars, ex, num_esc)
         end
         return varlist
     elseif isa(ex, Expr)
-        if ex.head == :quote || ex.head == :line
+        if ex.head == :quote || ex.head == :line || ex.head == :inbounds
             return varlist
         end
         if ex.head == :(=)
