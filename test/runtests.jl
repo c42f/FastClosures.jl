@@ -157,6 +157,18 @@ end
         )) == [:e,:f]
 end
 
+@testset "Excluded expr heads" begin
+    # Expr(:inbounds) excluded
+    @test find_var_uses(macroexpand(@__MODULE__, quote
+        b = @inbounds a[i]
+    end)) == [:a, :i]
+
+    # Expr(:quote) excluded
+    @test find_var_uses(quote
+        b = :(x + y)
+    end) == []
+end
+
 @testset "do syntax" begin
     function test_do(a)
         b = zeros(10)
