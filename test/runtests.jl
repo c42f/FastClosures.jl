@@ -112,6 +112,14 @@ end
             i+1
         end
         )) == []
+    # Declaring variables of given type
+    @test find_var_uses(:(
+        begin
+            y::S = 0.0
+            x::T
+            z
+        end
+        )) == [:S, :T, :z]
 end
 
 
