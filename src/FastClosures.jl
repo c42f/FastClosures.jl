@@ -133,6 +133,8 @@ function find_var_uses!(varlist, bound_vars, ex, num_esc)
                     find_var_uses!(varlist, bound_vars, e, num_esc)
                 end
             end
+        elseif ex.head == :(::)
+            find_var_uses_lhs!(varlist, bound_vars, ex, num_esc)
         elseif ex.head == :escape
             # In the 0.7-DEV churn, escapes persist during recursive macro
             # expansion until all macros are expanded.  Therefore, we
@@ -160,6 +162,9 @@ function find_var_uses_lhs!(varlist, bound_vars, ex, num_esc)
     elseif isa(ex, Expr)
         if ex.head == :tuple
             find_var_uses_lhs!(varlist, bound_vars, ex.args, num_esc)
+        elseif ex.head == :(::)
+            find_var_uses!(varlist, bound_vars, ex.args[2], num_esc)
+            find_var_uses_lhs!(varlist, bound_vars, ex.args[1], num_esc)
         else
             find_var_uses!(varlist, bound_vars, ex.args, num_esc)
         end
