@@ -1,11 +1,8 @@
 # FastClosures
 
-| **Releases - PackageEvaluator**                                                                            | **Development - Build Status**                                                                                |
-|:-----------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------:|
-| [![FastClosures](http://pkg.julialang.org/badges/FastClosures_0.5.svg)](http://pkg.julialang.org/detail/FastClosures)    [![FastClosures](http://pkg.julialang.org/badges/FastClosures_0.6.svg)](http://pkg.julialang.org/detail/FastClosures) | [![Build Status](https://travis-ci.org/c42f/FastClosures.jl.svg?branch=master)](https://travis-ci.org/c42f/FastClosures.jl)   [![codecov.io](http://codecov.io/github/c42f/FastClosures.jl/coverage.svg?branch=master)](http://codecov.io/github/c42f/FastClosures.jl?branch=master) |
+[![Build Status](https://github.com/c42f/FastClosures.jl/workflows/CI/badge.svg)](https://github.com/c42f/FastClosures.jl/actions)
 
-
-A workaround for https://github.com/JuliaLang/julia/issues/15276, for julia-0.6,
+A workaround for https://github.com/JuliaLang/julia/issues/15276, for julia-1.x,
 somewhat in the spirit of FastAnonymous.jl.  Provides the `@closure` macro,
 which wraps a closure in a `let` block to make reading variable bindings private
 to the closure.  In certain cases, this make using the closure - and the code
